@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev src/",
     "build": "tsc",
-    "start": "npm run build && cross-env NODE_ENV=production node build/"
+    "start": "npm run build && cross-env NODE_ENV=production node dist/"
   },
   "repository": {
     "type": "git",
