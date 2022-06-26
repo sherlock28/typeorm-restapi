@@ -61,8 +61,21 @@ const updateUser = async (req: Request, res: Response): Promise<Response> => {
     }
 };
 
-const deleteUser = async (_req: Request, res: Response) => {
-    return res.status(Http.OK).json({ msg: "Delete user" });
+const deleteUser = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const result = await User.delete({ id: +req.params.id });
+        if (result.affected != 0) {
+            const serviceResponse = new ServiceResponse(null, true, "User deleted successfully.", null);
+            return res.status(Http.OK).json(serviceResponse.JSON());
+        }
+        const serviceResponse = new ServiceResponse(null, true, "User not found.", null);
+        return res.status(Http.OK).json(serviceResponse.JSON());
+    } catch (error) {
+        console.error(error);
+        const errMsg = error instanceof Error ? error.message : "Internal server error";
+        const errorServiceResponse = new ServiceResponse(null, false, "Failed to update user.", errMsg);
+        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+    }
 };
 
 export {
