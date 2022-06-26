@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import { User } from '../entities';
 
 const defaultConfig = {
     pghost: "localhost",
@@ -17,7 +18,7 @@ export const AppDataSource = new DataSource({
     database: process.env.PGDATABASE || defaultConfig.pgdatabase,
     synchronize: true,
     logging: process.env.NODE_ENV === "development" ? true : false,
-    entities: [],
+    entities: [User],
     subscribers: [],
     migrations: [],
 })
