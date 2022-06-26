@@ -10,9 +10,9 @@ const getAllUsers = async (req: Request, res: Response): Promise<Response> => {
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
         console.error(error);
-        const errMsg = error instanceof Error ? error.message : "Internal server error"
-		const errorServiceResponse = new ServiceResponse(null, false, "Could not get users.", errMsg);
-		return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+        const errMsg = error instanceof Error ? error.message : "Internal server error";
+        const errorServiceResponse = new ServiceResponse(null, false, "Could not get users.", errMsg);
+        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
     }
 };
 
@@ -32,14 +32,33 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
         console.error(error);
-        const errMsg = error instanceof Error ? error.message : "Internal server error"
-		const errorServiceResponse = new ServiceResponse(null, false, "Failed to create user.", errMsg);
-		return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+        const errMsg = error instanceof Error ? error.message : "Internal server error";
+        const errorServiceResponse = new ServiceResponse(null, false, "Failed to create user.", errMsg);
+        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
     }
 };
 
-const updateUser = async (_req: Request, res: Response) => {
-    return res.status(Http.OK).json({ msg: "Update user" });
+const updateUser = async (req: Request, res: Response): Promise<Response> => {
+    const { firstname, lastname, age, isactive } = req.body;
+    try {
+        const user = await User.findOneBy({ id: +req.params.id });
+        if (user) {
+            user.first_name = firstname;
+            user.last_name = lastname;
+            user.age = age;
+            user.is_active = isactive;
+            await user.save();
+            const serviceResponse = new ServiceResponse(user, true, "User updated successfully.", null);
+            return res.status(Http.OK).json(serviceResponse.JSON());
+        }
+        const serviceResponse = new ServiceResponse(null, true, "User not found.", null);
+        return res.status(Http.OK).json(serviceResponse.JSON());
+    } catch (error) {
+        console.error(error);
+        const errMsg = error instanceof Error ? error.message : "Internal server error";
+        const errorServiceResponse = new ServiceResponse(null, false, "Failed to update user.", errMsg);
+        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+    }
 };
 
 const deleteUser = async (_req: Request, res: Response) => {
