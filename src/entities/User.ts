@@ -14,7 +14,7 @@ export class User extends BaseEntity {
     @Column()
     age: number
 
-    @Column()
+    @Column({ default: true })
     is_active: boolean
 
     @CreateDateColumn()
