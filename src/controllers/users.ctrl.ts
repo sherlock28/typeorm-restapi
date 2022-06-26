@@ -16,8 +16,21 @@ const getAllUsers = async (req: Request, res: Response): Promise<Response> => {
     }
 };
 
-const getUserById = async (_req: Request, res: Response) => {
-    return res.status(Http.OK).json({ msg: "Get user by id" });
+const getUserById = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const user = await User.findOneBy({ id: +req.params.id });
+        if (!user) {
+            const serviceResponse = new ServiceResponse(null, true, "User not found.", null);
+            return res.status(Http.OK).json(serviceResponse.JSON());
+        }
+        const serviceResponse = new ServiceResponse(user, true, "User obtained successfully.", null);
+        return res.status(Http.OK).json(serviceResponse.JSON());
+    } catch (error) {
+        console.error(error);
+        const errMsg = error instanceof Error ? error.message : "Internal server error";
+        const errorServiceResponse = new ServiceResponse(null, false, "Could not get users.", errMsg);
+        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+    }
 };
 
 const createUser = async (req: Request, res: Response): Promise<Response> => {
@@ -42,16 +55,16 @@ const updateUser = async (req: Request, res: Response): Promise<Response> => {
     const { firstname, lastname, age, isactive } = req.body;
     try {
         const user = await User.findOneBy({ id: +req.params.id });
-        if (user) {
-            user.first_name = firstname;
-            user.last_name = lastname;
-            user.age = age;
-            user.is_active = isactive;
-            await user.save();
-            const serviceResponse = new ServiceResponse(user, true, "User updated successfully.", null);
+        if (!user) {
+            const serviceResponse = new ServiceResponse(null, true, "User not found.", null);
             return res.status(Http.OK).json(serviceResponse.JSON());
         }
-        const serviceResponse = new ServiceResponse(null, true, "User not found.", null);
+        user.first_name = firstname;
+        user.last_name = lastname;
+        user.age = age;
+        user.is_active = isactive;
+        await user.save();
+        const serviceResponse = new ServiceResponse(user, true, "User updated successfully.", null);
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
         console.error(error);
@@ -64,11 +77,11 @@ const updateUser = async (req: Request, res: Response): Promise<Response> => {
 const deleteUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const result = await User.delete({ id: +req.params.id });
-        if (result.affected != 0) {
-            const serviceResponse = new ServiceResponse(null, true, "User deleted successfully.", null);
+        if (result.affected == 0) {
+            const serviceResponse = new ServiceResponse(null, true, "User not found.", null);
             return res.status(Http.OK).json(serviceResponse.JSON());
         }
-        const serviceResponse = new ServiceResponse(null, true, "User not found.", null);
+        const serviceResponse = new ServiceResponse(null, true, "User deleted successfully.", null);
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
         console.error(error);
