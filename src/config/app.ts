@@ -11,7 +11,7 @@ export const configure = () => {
     app.use(express.urlencoded({ extended: false }))
 
     // routes
-    app.use('/api', userRoutes)
+    app.use('/api', userRoutes);
 
     if (process.env.NODE_ENV === "development") {
         app.use(require("morgan")("dev"));

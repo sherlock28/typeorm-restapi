@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ServiceResponse } from '../abstractions/ServiceResponse';
 import { HttpStatusCode as Http } from '../abstractions/HttpStatusCode';
 import { User } from '../entities';
+import { handlerErrors } from '../handlers/handlerErrors';
 
 const getAllUsers = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -9,10 +10,7 @@ const getAllUsers = async (req: Request, res: Response): Promise<Response> => {
         const serviceResponse = new ServiceResponse(users, true, "User created successfully.", null);
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
-        console.error(error);
-        const errMsg = error instanceof Error ? error.message : "Internal server error";
-        const errorServiceResponse = new ServiceResponse(null, false, "Could not get users.", errMsg);
-        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+        return handlerErrors(error, req, res, "Could not get users.");
     }
 };
 
@@ -26,10 +24,7 @@ const getUserById = async (req: Request, res: Response): Promise<Response> => {
         const serviceResponse = new ServiceResponse(user, true, "User obtained successfully.", null);
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
-        console.error(error);
-        const errMsg = error instanceof Error ? error.message : "Internal server error";
-        const errorServiceResponse = new ServiceResponse(null, false, "Could not get users.", errMsg);
-        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+        return handlerErrors(error, req, res, "Could not get user.");
     }
 };
 
@@ -44,10 +39,7 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
         const serviceResponse = new ServiceResponse(user, true, "User created successfully.", null);
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
-        console.error(error);
-        const errMsg = error instanceof Error ? error.message : "Internal server error";
-        const errorServiceResponse = new ServiceResponse(null, false, "Failed to create user.", errMsg);
-        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+        return handlerErrors(error, req, res,  "Failed to create user.");
     }
 };
 
@@ -67,10 +59,7 @@ const updateUser = async (req: Request, res: Response): Promise<Response> => {
         const serviceResponse = new ServiceResponse(user, true, "User updated successfully.", null);
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
-        console.error(error);
-        const errMsg = error instanceof Error ? error.message : "Internal server error";
-        const errorServiceResponse = new ServiceResponse(null, false, "Failed to update user.", errMsg);
-        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+        return handlerErrors(error, req, res,  "Failed to update user.");
     }
 };
 
@@ -84,10 +73,7 @@ const deleteUser = async (req: Request, res: Response): Promise<Response> => {
         const serviceResponse = new ServiceResponse(null, true, "User deleted successfully.", null);
         return res.status(Http.OK).json(serviceResponse.JSON());
     } catch (error) {
-        console.error(error);
-        const errMsg = error instanceof Error ? error.message : "Internal server error";
-        const errorServiceResponse = new ServiceResponse(null, false, "Failed to update user.", errMsg);
-        return res.status(Http.INTERNAL_SERVER_ERROR).json(errorServiceResponse.JSON());
+        return handlerErrors(error, req, res,  "Failed to delete user.");
     }
 };
 
